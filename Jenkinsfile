@@ -1,6 +1,6 @@
 pipeline {
   environment {
-    registry = "interviewdot/cicd-demo"
+    registry = "vinoth1310/sample-project"
     registryCredential = 'docker-hub-credentials'
     dockerImage = ''
   }
@@ -8,7 +8,7 @@ pipeline {
   stages {
     stage('Cloning Git') {
       steps {
-        git 'https://github.com/net-vinothkumar/devops-cicd-demo.git'
+        git 'https://github.com/Vinoth1310/Test-application.git/'
       }
     }
     stage('Building image') {
@@ -32,9 +32,7 @@ pipeline {
         }
       }
     }
-    stage('Deploy to K8S'){
-        steps{
-            sh 'kubectl apply -f deployment.yml'
+    
        }
     }
   }
