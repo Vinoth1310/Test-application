@@ -9,7 +9,7 @@ pipeline {
         stage('SCM Checkout') {
             steps {
                 sh 'rm -rf nodedemo || true'  // Remove existing directory if it exists
-                sh 'git clone https://github.com/Vinoth1310/devops-cicd-.git'
+                sh 'git clone https://github.com/Vinoth1310/Test-application.git'
                 echo 'test1'
             }
         }
