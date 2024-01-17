@@ -1,39 +1,47 @@
 pipeline {
-  environment {
-    registry = "vinoth1310/sample-project"
-    registryCredential = 'docker-hub-credentials'
-    dockerImage = ''
-  }
-  agent any
-  stages {
-    stage('Cloning Git') {
-      steps {
-        git 'https://github.com/Vinoth1310/Test-application.git/'
-      }
+    agent any 
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
     }
-    stage('Building image') {
-      steps{
-        script {
-          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+
+    stages {
+        stage('SCM Checkout') {
+            steps {
+                sh 'rm -rf nodedemo || true'  // Remove existing directory if it exists
+                sh 'git clone https://github.com/Vinoth1310/devops-cicd-.git'
+                echo 'test1'
+            }
         }
-      }
-    }
-    stage('Push Image') {
-      steps{
-        script {
-          /* Finally, we'll push the image with two tags:
-                   * First, the incremental build number from Jenkins
-                   * Second, the 'latest' tag.
-                   * Pushing multiple tags is cheap, as all the layers are reused. */
-          docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-              dockerImage.push("${env.BUILD_NUMBER}")
-              dockerImage.push("latest")
-          }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'test2'
+                sh 'docker build -t vinoth1310/sample-project:latest .'
+            }
         }
-      }
+
+        stage('Login to DockerHub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh "docker login -u vinoth1310 -p Vinoth@1310"
+                    }
+                    echo 'test3'
+                }
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh 'docker push vinoth1310/sample-project:latest '
+            }
+        }
     }
-    
-       }
+
+    post {
+        always {
+            sh 'docker logout'
+        }
     }
-  }
 }
